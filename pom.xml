@@ -14,6 +14,10 @@
         <encoding>UTF-8</encoding>
         <scala.version>2.11.8</scala.version>
         <scala.compat.version>2.11</scala.compat.version>
+
+
+        <akka.version>2.5.30</akka.version>
+        <akka.http.version>10.1.5</akka.http.version>
     </properties>
 
 
@@ -26,17 +30,26 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <repository>
-            <id>oss-sonatype</id>
-            <name>oss-sonatype</name>
-            <url>	https://dl.bintray.com/evolutiongaming/maven/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>2.9.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <dependencies>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -59,7 +72,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-mllib -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-mllib_2.11</artifactId>
@@ -73,7 +85,6 @@
             <version>2.11.8</version>
         </dependency>
 
-        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.google.cloud/google-cloud-datastore &ndash;&gt;-->
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-datastore</artifactId>
@@ -90,7 +101,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>15.0</version>
+            <version>23.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.json4s/json4s-native -->
@@ -124,18 +135,56 @@
             <version>v1-rev452-1.25.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.evolutiongaming</groupId>
-            <artifactId>pubsub_2.11</artifactId>
-            <version>2.2.5</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.evolutiongaming</groupId>-->
+        <!--            <artifactId>pubsub_2.11</artifactId>-->
+        <!--            <version>2.2.5</version>-->
+        <!--        </dependency>-->
+
+        <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
 
 
         <!--        <dependency>-->
-        <!--            <groupId>com.github.samelamin</groupId>-->
-        <!--            <artifactId>spark-bigquery_2.11</artifactId>-->
-        <!--            <version>0.2.6</version>-->
+        <!--            <groupId>com.lightbend.akka</groupId>-->
+        <!--            <artifactId>akka-stream-alpakka-google-cloud-pub-sub_2.11</artifactId>-->
+        <!--            <version>2.0.0-RC1</version>-->
         <!--        </dependency>-->
+
+        <!--        <dependency>-->
+        <!--            <groupId>com.lightbend.akka</groupId>-->
+        <!--            <artifactId>akka-stream-alpakka-google-cloud-pub-sub-grpc_2.11</artifactId>-->
+        <!--            <version>1.0-M3</version>-->
+        <!--        </dependency>-->
+
+        <!--        <dependency>-->
+        <!--            <groupId>com.typesafe.akka</groupId>-->
+        <!--            <artifactId>akka-stream_2.11</artifactId>-->
+        <!--            <version>${akka.version}</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.typesafe.akka</groupId>-->
+        <!--            <artifactId>akka-http_2.11</artifactId>-->
+        <!--            <version>${akka.http.version}</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.typesafe.akka</groupId>-->
+        <!--            <artifactId>akka-http-spray-json_2.11</artifactId>-->
+        <!--            <version>${akka.http.version}</version>-->
+        <!--        </dependency>-->
+
+        <!--        <dependency>-->
+        <!--            <groupId>com.typesafe.akka</groupId>-->
+        <!--            <artifactId>akka-discovery_2.11</artifactId>-->
+        <!--            <version>${akka.version}</version>-->
+        <!--        </dependency>-->
+
+        <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+
+        <dependency>
+            <groupId>com.github.samelamin</groupId>
+            <artifactId>spark-bigquery_2.11</artifactId>
+            <version>0.2.6</version>
+        </dependency>
 
 
     </dependencies>

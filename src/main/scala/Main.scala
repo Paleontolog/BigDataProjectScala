@@ -1,12 +1,17 @@
 
-import com.evolutiongaming.cluster.pubsub.LocalPubSub
+import java.nio.charset.StandardCharsets
+
 import com.typesafe.config.ConfigFactory
 import entities.DataObject
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.storage.StorageLevel
+import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.pubsub.{PubsubUtils, SparkGCPCredentials}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.json4s._
 import org.json4s.native.JsonMethods._
+import utils.PubSubReceiver
 
 
 //Для Goolge Cloud: Pub/Sub - queue, Dataproc для запуска Spark приложения,
@@ -30,12 +35,13 @@ object Main {
     val slidingInterval = ConfigFactory.load().getString("application.slidingInterval").toInt
     val tempBucket = ConfigFactory.load().getString("database.tempBucket")
     val projectID = ConfigFactory.load().getString("project.id")
+    val subscription = ConfigFactory.load().getString("pubsub.subscription")
+    val topic = ConfigFactory.load().getString("pubsub.topic")
 
 
     val conf = new SparkConf().setAppName(appName).setMaster("local[*]")
     val sc = new SparkContext(conf)
-    val ssc: StreamingContext =
-      new StreamingContext(sc, Seconds(batchDuration.toInt))
+    val ssc: StreamingContext = new StreamingContext(sc, Seconds(batchDuration.toInt))
     val spark = SparkSession.builder
       .config(conf)
       .getOrCreate()
@@ -44,27 +50,35 @@ object Main {
     //spark.conf.set("credentialsFile", getClass.getResource("/keys/keyJson.json").getPath)
     //spark.conf.set("temporaryGcsBucket", tempBucket)
 
+    //    //
+    //    val lines: DStream[DataObject] =
+    //      ssc.textFileStream("D:\\PycharmProjects\\BigDataProject\\emulation")
+    //        //.window(Seconds(windowLength), Seconds(slidingInterval))
+    //        .map(_.replaceAll("NaN", "null"))
+    //        .map(parseJson)
     //
-    val lines =
-      ssc.textFileStream("D:\\PycharmProjects\\BigDataProject\\emulation")
-        //.window(Seconds(windowLength), Seconds(slidingInterval))
+    //    lines.print()
+
+    val pubSubTest = new PubSubReceiver("localhost", 8085)
+
+    val lines: DStream[DataObject] =
+      ssc.receiverStream(pubSubTest)
         .map(_.replaceAll("NaN", "null"))
-        .map(parseJson(_))
+        .map(parseJson)
 
     lines.print()
 
-
-//
-//    val lines: DStream[String] = PubsubUtils
+//    val lines: DStream[DataObject] = PubsubUtils
 //      .createStream(
 //        ssc,
 //        projectID,
-//        Option("testTopic"),
-//        "tweets-subscription",
+//        Option(topic),
+//        subscription,
 //        SparkGCPCredentials.builder.build(), StorageLevel.MEMORY_AND_DISK_SER_2)
 //      .map(message => new String(message.getData(), StandardCharsets.UTF_8))
-
-//    lines.print()
+//      .map(_.replaceAll("NaN", "null"))
+//      .map(parseJson)
+    //    lines.print()
 
     //    CalculateMetrics.calculateAllMetrics(lines,
     //      spark,
