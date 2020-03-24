@@ -1,10 +1,11 @@
 package database
+
 import com.typesafe.config.ConfigFactory
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode, SparkSession}
 import org.apache.spark.streaming.Time
 import org.apache.spark.sql.functions.lit
 import utils.Utils._
-import com.samelamin.spark.bigquery._
+
 
 
 object Database {
@@ -18,16 +19,20 @@ object Database {
     val allTime = fullDateFromMilliseconds(time.milliseconds)
     val resultDataFrame = dataFrame.withColumn("time", lit(allTime))
 
-    resultDataFrame.write.format("bigquery")
-      .option("table", s"$datasetName.$tableName")
-      .mode(SaveMode.Append)
-      .save()
+    //    resultDataFrame.write.format("bigquery")
+    //      .option("table", s"$datasetName.$tableName")
+    //      .mode(SaveMode.Append)
+    //      .save()
   }
 
-  def saveMetricsInDatabaseGlobal(): Unit = {
+  def saveMetricsInDatabaseGlobal(dataFrame: DataFrame,
+                                  tableName: String,
+                                  time: Time,
+                                  sqlContext: SQLContext): Unit = {
 
+
+
+    //makebigQueryContext(sql = sqlContext).runDMLQuery("")
     // Load results from a SQL query
-    sqlContext.runDMLQuery("UPDATE dataset-id.table-name SET test_col = new_value WHERE test_col = old_value")
   }
-
 }

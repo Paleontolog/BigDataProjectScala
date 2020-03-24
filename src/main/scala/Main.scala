@@ -1,9 +1,12 @@
 
 import java.nio.charset.StandardCharsets
 
+import database.Database._
+import database.DataStore.{filepath, _}
 import com.typesafe.config.ConfigFactory
 import entities.DataObject
-import org.apache.spark.sql.SparkSession
+import metrics.CalculateMetrics
+import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.pubsub.{PubsubUtils, SparkGCPCredentials}
@@ -13,6 +16,7 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 import utils.PubSubReceiver
 
+//import com.samelamin.spark.bigquery._
 
 //Для Goolge Cloud: Pub/Sub - queue, Dataproc для запуска Spark приложения,
 // база BigQuery, хранилище Google Storage.
@@ -46,7 +50,7 @@ object Main {
       .config(conf)
       .getOrCreate()
 
-
+    print("Hello")
     //spark.conf.set("credentialsFile", getClass.getResource("/keys/keyJson.json").getPath)
     //spark.conf.set("temporaryGcsBucket", tempBucket)
 
@@ -59,33 +63,33 @@ object Main {
     //
     //    lines.print()
 
-    val pubSubTest = new PubSubReceiver("localhost", 8085)
-
-    val lines: DStream[DataObject] =
-      ssc.receiverStream(pubSubTest)
-        .map(_.replaceAll("NaN", "null"))
-        .map(parseJson)
-
-    lines.print()
-
-//    val lines: DStream[DataObject] = PubsubUtils
-//      .createStream(
-//        ssc,
-//        projectID,
-//        Option(topic),
-//        subscription,
-//        SparkGCPCredentials.builder.build(), StorageLevel.MEMORY_AND_DISK_SER_2)
-//      .map(message => new String(message.getData(), StandardCharsets.UTF_8))
-//      .map(_.replaceAll("NaN", "null"))
-//      .map(parseJson)
+    //    val pubSubTest = new PubSubReceiver("localhost", 8085)
+    //
+    //    val lines: DStream[DataObject] =
+    //      ssc.receiverStream(pubSubTest)
+    //        .map(_.replaceAll("NaN", "null"))
+    //        .map(parseJson)
+    //
     //    lines.print()
 
-    //    CalculateMetrics.calculateAllMetrics(lines,
-    //      spark,
-    //      10,
-    //      saveInDataStore,
-    //      saveMetricsInDatabase
-    //    )
+    //    val lines: DStream[DataObject] = PubsubUtils
+    //      .createStream(
+    //        ssc,
+    //        projectID,
+    //        Option(topic),
+    //        subscription,
+    //        SparkGCPCredentials.builder.build(), StorageLevel.MEMORY_AND_DISK_SER_2)
+    //      .map(message => new String(message.getData(), StandardCharsets.UTF_8))
+    //      .map(_.replaceAll("NaN", "null"))
+    //      .map(parseJson)
+    //    lines.print()
+
+    //        CalculateMetrics.calculateAllMetrics(lines,
+    //          spark,
+    //          10,
+    //          saveInDataStore,
+    //          saveMetricsInDatabase
+    //        )
 
     ssc
   }
@@ -98,8 +102,19 @@ object Main {
     val ssc = StreamingContext.getOrCreate(checkpointDirectory,
       () => createContext())
 
-
-    ssc.start()
-    ssc.awaitTermination()
+    //
+    //    ssc.start()
+    //    ssc.awaitTermination()
   }
 }
+
+
+//
+//val squaresDF = spark
+//  .sparkContext
+//  .makeRDD(1 to 5).map(i => (i, i * i))
+//
+//val d = spark.createDataFrame(squaresDF)
+//val filepath: String = ConfigFactory.load().getString("dataStore.path")
+//d.write.mode(SaveMode.Overwrite)
+//  .parquet(s"$filepath/temp/fullName.parquet")

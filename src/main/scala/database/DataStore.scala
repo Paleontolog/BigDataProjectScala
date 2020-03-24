@@ -1,7 +1,7 @@
 package database
 
 import com.typesafe.config.ConfigFactory
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.streaming.Time
 import utils.Utils._
 
@@ -20,8 +20,9 @@ object DataStore {
     val time_hours = hoursFromMilliseconds(time.milliseconds)
     val fullName = fullDateFromMilliseconds(time.milliseconds)
 
-//    dataFrame.write.mode(SaveMode.Overwrite)
-//      .parquet(s"$filepath/$time_date/$time_hours/$fullName.parquet")
+    dataFrame.write.mode(SaveMode.Overwrite)
+      //.partitionBy("Time")
+      .parquet(s"$filepath/$time_date/$time_hours/$fullName.parquet")
 
   }
 
