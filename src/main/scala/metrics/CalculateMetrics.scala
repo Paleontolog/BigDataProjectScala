@@ -1,5 +1,7 @@
 package metrics
 
+import database.Database
+import database.Database.{executeQuery, saveMetricsInDatabaseBatch,executeQueryBatch, mergeQuery}
 import entities.DataObject
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -50,43 +52,40 @@ object CalculateMetrics {
   }
 
 
-  private[metrics] def saveTopN(dataframe: DataFrame, time: Time, n: Int,
-                                fieldName: String,
-                                saveMetrics: (DataFrame, String, Time) => Unit): Unit = {
-    val topOnBatch = dataframe.limit(n)
-    saveMetrics(topOnBatch, fieldName, time)
-  }
-
-
   private[metrics] def calculateDataFrame(time: Time,
                                           rdd: RDD[DataObject],
                                           context: SparkSession,
+                                          argument: String,
+                                          n: Int,
                                           saveOnDrive: (Time, DataFrame) => Unit,
-                                          saveMetrics: (DataFrame, String, Time) => Unit): Unit = {
+                                          saveMetrics: (DataFrame, String, Int, Time, SparkSession, String) => Unit): Unit = {
 
     val dataFrame = context.createDataFrame(rdd)
-    dataFrame.show()
 
     saveOnDrive(time, dataFrame)
-
+//
     val states = countDataFrame(dataFrame, "state")
-    saveTopN(states, time, 10, "state", saveMetrics)
+    //Database.saveMetricsInDatabaseGlobal(states, "state", time, context)
+    saveMetrics(states, "state", n, time, context, argument)
 
     val cityOrCounty = countDataFrame(dataFrame, "city_or_county")
-    saveTopN(cityOrCounty, time, 10, "city_or_county", saveMetrics)
+//    Database.saveMetricsInDatabaseGlobal(cityOrCounty, "city_or_county", time, context)
+    saveMetrics(cityOrCounty, "city_or_county", n, time, context, argument)
 
     val gun_stolen = countIfContains(dataFrame, "gun_stolen")
-    saveTopN(gun_stolen, time, 1, "gun_stolen", saveMetrics)
+    saveMetricsInDatabaseBatch(gun_stolen, "gun_stolen", time)
+
   }
 
 
   def calculateAllMetrics(input: DStream[DataObject],
                           context: SparkSession,
+                          argunent: String,
                           n: Int,
                           saveOnDrive: (Time, DataFrame) => Unit,
-                          saveMetrics: (DataFrame, String, Time) => Unit): Unit = {
+                          saveMetrics: (DataFrame, String, Int, Time, SparkSession, String) => Unit): Unit = {
 
     input.foreachRDD((rdd: RDD[DataObject], time: Time) =>
-      calculateDataFrame(time, rdd, context, saveOnDrive, saveMetrics))
+      calculateDataFrame(time, rdd, context, argunent, n, saveOnDrive, saveMetrics))
   }
 }

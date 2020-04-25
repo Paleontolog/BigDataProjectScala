@@ -1,4 +1,14 @@
 # Project exclude paths
 /target/
 src/main/resources/application.conf
+src/main/resources/gun-project.json
+src/main/resources/database/schema1.json
+dependency-reduced-pom.xml
 
+spark-warehouse
+src/test/
+BigDataProjectScalaJar.7z
+BigDataProjectScalaJarBASE
+BigDataProjectScalaJarGLOBAL
+
+temp.txt

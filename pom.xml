@@ -12,7 +12,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <encoding>UTF-8</encoding>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.11.12</scala.version>
         <scala.compat.version>2.11</scala.compat.version>
     </properties>
 
@@ -42,10 +42,15 @@
 
 
     <dependencies>
+
+
         <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-pubsub</artifactId>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.11.12</version>
         </dependency>
+
+
 
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -74,24 +79,16 @@
             <version>2.4.4</version>
         </dependency>
 
-
-<!--        <dependency>-->
-<!--            <groupId>org.scala-lang</groupId>-->
-<!--            <artifactId>scala-library</artifactId>-->
-<!--            <version>2.11.8</version>-->
-<!--        </dependency>-->
-
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.11.8</version>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-datastore</artifactId>
-            <version>1.102.3</version>
+            <artifactId>google-cloud-storage</artifactId>
         </dependency>
+
 
         <dependency>
             <groupId>com.typesafe</groupId>
@@ -121,11 +118,18 @@
         </dependency>
 
 
+<!--        <dependency>-->
+<!--            <groupId>com.google.cloud.spark</groupId>-->
+<!--            <artifactId>spark-bigquery-with-dependencies_${scala.compat.version}</artifactId>-->
+<!--            <version>0.13.1-beta</version>-->
+<!--        </dependency>-->
+
         <dependency>
             <groupId>com.google.cloud.spark</groupId>
-            <artifactId>spark-bigquery-with-dependencies_2.11</artifactId>
+            <artifactId>spark-bigquery_2.11</artifactId>
             <version>0.13.1-beta</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.apache.bahir</groupId>
@@ -139,24 +143,61 @@
             <version>v1-rev452-1.25.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.samelamin</groupId>
-            <artifactId>spark-bigquery_2.11</artifactId>
-            <version>0.2.6</version>
-        </dependency>
-
+        <!--++++++++++++++++++++++++local testing++++++++++++++++++++++++++++++++++-->
 
         <dependency>
             <groupId>com.google.cloud.bigdataoss</groupId>
-            <artifactId>bigquery-connector</artifactId>
-            <version>hadoop2-1.1.1</version>
+            <artifactId>gcs-connector</artifactId>
+            <version>hadoop3-1.9.16</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.seratch</groupId>
-            <artifactId>bigquery4s_2.11</artifactId>
-            <version>0.9</version>
+            <groupId>com.google.cloud.bigdataoss</groupId>
+            <artifactId>util</artifactId>
+            <version>1.9.16</version>
         </dependency>
+
+        <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-bigquery</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-datastore</artifactId>
+            <version>1.102.3</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+
+        <!--       <dependency>-->
+<!--            <groupId>org.apache.spark</groupId>-->
+<!--            <artifactId>spark-avro_2.11</artifactId>-->
+<!--            <version>2.4.4</version>-->
+<!--        </dependency>-->
+
+
+
+<!--        <dependency>-->
+<!--            <groupId>com.github.samelamin</groupId>-->
+<!--            <artifactId>spark-bigquery_${scala.compat.version}</artifactId>-->
+<!--            <version>0.2.6</version>-->
+<!--        </dependency>-->
+
+
+        <!--        <dependency>-->
+<!--            <groupId>com.github.samelamin</groupId>-->
+<!--            <artifactId>spark-bigquery_2.11</artifactId>-->
+<!--            <version>0.2.6</version>-->
+<!--        </dependency>-->
 
 
     </dependencies>
@@ -166,62 +207,66 @@
         <testSourceDirectory>src/test/scala</testSourceDirectory>
 
         <plugins>
+
             <plugin>
-                <!-- see http://davidb.github.com/scala-maven-plugin -->
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.3</version>
+                <version>4.3.0</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>compile</goal>
                             <goal>testCompile</goal>
                         </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>2.11</scalaVersion>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
                         <configuration>
-                            <args>
-                                <!--                                <arg>-make:transitive</arg>-->
-                                <arg>-feature</arg>-->
-                                <arg>-deprecation</arg>
-                                <arg>-dependencyfile</arg>
-                                <arg>${project.build.directory}/.scala_dependencies</arg>
-                            </args>
-                            <archive>
-                                <manifest>
-                                    <mainClass></mainClass>
-                                </manifest>
-                            </archive>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>Main</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/maven/**</exclude>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com</pattern>
+                                    <shadedPattern>repackaged.com.google.common</shadedPattern>
+                                    <includes>
+                                        <include>com.google.common.**</include>
+                                    </includes>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- "package" command plugin -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
-
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>Main</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
 
 
@@ -230,7 +275,7 @@
         <!--                &lt;!&ndash; see http://davidb.github.com/scala-maven-plugin &ndash;&gt;-->
         <!--                <groupId>net.alchim31.maven</groupId>-->
         <!--                <artifactId>scala-maven-plugin</artifactId>-->
-        <!--                <version>3.3.1</version>-->
+        <!--                <version>3.1.3</version>-->
         <!--                <executions>-->
         <!--                    <execution>-->
         <!--                        <goals>-->
@@ -239,7 +284,7 @@
         <!--                        </goals>-->
         <!--                        <configuration>-->
         <!--                            <args>-->
-        <!--                                <arg>-feature</arg>-->
+        <!--                                <arg>-feature</arg>&ndash;&gt;-->
         <!--                                <arg>-deprecation</arg>-->
         <!--                                <arg>-dependencyfile</arg>-->
         <!--                                <arg>${project.build.directory}/.scala_dependencies</arg>-->
@@ -248,112 +293,35 @@
         <!--                    </execution>-->
         <!--                </executions>-->
         <!--            </plugin>-->
+
+        <!--            &lt;!&ndash; "package" command plugin &ndash;&gt;-->
         <!--            <plugin>-->
-        <!--                <groupId>org.apache.maven.plugins</groupId>-->
-        <!--                <artifactId>maven-surefire-plugin</artifactId>-->
-        <!--                <version>2.18.1</version>-->
+        <!--                <artifactId>maven-assembly-plugin</artifactId>-->
+        <!--                <version>2.4.1</version>-->
+
         <!--                <configuration>-->
-        <!--                    <useFile>false</useFile>-->
-        <!--                    <disableXmlReport>true</disableXmlReport>-->
-        <!--                    &lt;!&ndash; If you have classpath issue like NoDefClassError,... &ndash;&gt;-->
-        <!--                    &lt;!&ndash; useManifestOnlyJar>false</useManifestOnlyJar &ndash;&gt;-->
-        <!--                    <includes>-->
-        <!--                        <include>**/*Test.*</include>-->
-        <!--                        <include>**/*Suite.*</include>-->
-        <!--                    </includes>-->
+        <!--                    <archive>-->
+        <!--                        <manifest>-->
+        <!--                            <addClasspath>true</addClasspath>-->
+        <!--                            <mainClass>Main</mainClass>-->
+        <!--                        </manifest>-->
+        <!--                    </archive>-->
+        <!--                    <descriptorRefs>-->
+        <!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
+        <!--                    </descriptorRefs>-->
         <!--                </configuration>-->
-        <!--            </plugin>-->
-        <!--            <plugin>-->
-        <!--                <groupId>org.codehaus.mojo</groupId>-->
-        <!--                <artifactId>exec-maven-plugin</artifactId>-->
-        <!--                <version>1.5.0</version>-->
         <!--                <executions>-->
         <!--                    <execution>-->
-        <!--                        <id>run-local</id>-->
-        <!--                        <goals>-->
-        <!--                            <goal>exec</goal>-->
-        <!--                        </goals>-->
-        <!--                        <configuration>-->
-        <!--                            <executable>spark-submit</executable>-->
-        <!--                            <arguments>-->
-        <!--                                <argument>&#45;&#45;master</argument>-->
-        <!--                                <argument>local</argument>-->
-        <!--                                <argument>${project.build.directory}/${project.artifactId}-${project.version}-uber.jar-->
-        <!--                                </argument>-->
-        <!--                            </arguments>-->
-        <!--                        </configuration>-->
-        <!--                    </execution>-->
-        <!--                    <execution>-->
-        <!--                        <id>run-yarn</id>-->
-        <!--                        <goals>-->
-        <!--                            <goal>exec</goal>-->
-        <!--                        </goals>-->
-        <!--                        <configuration>-->
-        <!--                            <environmentVariables>-->
-        <!--                                <HADOOP_CONF_DIR>-->
-        <!--                                    ${basedir}/spark-remote/conf-->
-        <!--                                </HADOOP_CONF_DIR>-->
-        <!--                            </environmentVariables>-->
-        <!--                            <executable>spark-submit</executable>-->
-        <!--                            <arguments>-->
-        <!--                                <argument>&#45;&#45;master</argument>-->
-        <!--                                <argument>yarn</argument>-->
-        <!--                                <argument>${project.build.directory}/${project.artifactId}-${project.version}-uber.jar-->
-        <!--                                </argument>-->
-        <!--                            </arguments>-->
-        <!--                        </configuration>-->
-        <!--                    </execution>-->
-        <!--                </executions>-->
-        <!--            </plugin>-->
-        <!--            &lt;!&ndash; Use the shade plugin to remove all the provided artifacts (such as-->
-        <!--                spark itself) from the uber jar &ndash;&gt;-->
-        <!--            <plugin>-->
-        <!--                <groupId>org.apache.maven.plugins</groupId>-->
-        <!--                <artifactId>maven-shade-plugin</artifactId>-->
-        <!--                <version>3.1.0</version>-->
-        <!--                <executions>-->
-        <!--                    <execution>-->
+        <!--                        <id>make-assembly</id>-->
         <!--                        <phase>package</phase>-->
         <!--                        <goals>-->
-        <!--                            <goal>shade</goal>-->
+        <!--                            <goal>single</goal>-->
         <!--                        </goals>-->
-        <!--                        <configuration>-->
-        <!--                            &lt;!&ndash; Remove signed keys to prevent security exceptions on uber jar &ndash;&gt;-->
-        <!--                            &lt;!&ndash; See https://stackoverflow.com/a/6743609/7245239 &ndash;&gt;-->
-        <!--                            <filters>-->
-        <!--                                <filter>-->
-        <!--                                    <artifact>*:*</artifact>-->
-        <!--                                    <excludes>-->
-        <!--                                        <exclude>META-INF/*.SF</exclude>-->
-        <!--                                        <exclude>META-INF/*.DSA</exclude>-->
-        <!--                                        <exclude>META-INF/*.RSA</exclude>-->
-        <!--                                    </excludes>-->
-        <!--                                </filter>-->
-        <!--                            </filters>-->
-        <!--                            <transformers>-->
-        <!--                                <transformer-->
-        <!--                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
-        <!--                                    <manifestEntries>-->
-        <!--                                        <Main-Class>net.martinprobson.spark.spark_example.SparkTest</Main-Class>-->
-        <!--                                    </manifestEntries>-->
-        <!--                                </transformer>-->
-        <!--                            </transformers>-->
-        <!--                            <artifactSet>-->
-        <!--                                <excludes>-->
-        <!--                                    <exclude>javax.servlet:*</exclude>-->
-        <!--                                    <exclude>org.apache.hadoop:*</exclude>-->
-        <!--                                    <exclude>org.apache.maven.plugins:*</exclude>-->
-        <!--                                    <exclude>org.apache.spark:*</exclude>-->
-        <!--                                    <exclude>org.apache.avro:*</exclude>-->
-        <!--                                    <exclude>org.apache.parquet:*</exclude>-->
-        <!--                                    <exclude>org.scala-lang:*</exclude>-->
-        <!--                                </excludes>-->
-        <!--                            </artifactSet>-->
-        <!--                            <finalName>${project.artifactId}-${project.version}-uber</finalName>-->
-        <!--                        </configuration>-->
         <!--                    </execution>-->
         <!--                </executions>-->
         <!--            </plugin>-->
         <!--        </plugins>-->
+
+
     </build>
 </project>
